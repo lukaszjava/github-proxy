@@ -7,9 +7,9 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class GithubRepositoryDto {
-    private String name;
+    private final String name;
     @JsonProperty("fork")
-    private boolean isFork;
+    private final boolean isFork;
     @JsonProperty("owner")
-    private OwnerDto ownerDto;
+    private final OwnerDto ownerDto;
 }

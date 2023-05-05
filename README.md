@@ -24,9 +24,8 @@ By default, the application runs on port 8080. You can access the API at
 
 ### Docker
 Make sure that you are in github-proxy catalog (at the same level as the dockerfile)
-1. mvn clean package
-2. docker build --tag=github-proxy:latest . or add a tag you like
-3. docker run -p8887:8080 github-proxy:latest 
+1. docker build --tag=github-proxy:latest . or add a tag you like
+2. docker run -p8887:8080 github-proxy:latest 
 
 then you can call api 
 

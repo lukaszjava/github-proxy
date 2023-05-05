@@ -7,5 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor(onConstructor_ = @JsonCreator)
 @Getter
 public class OwnerDto {
-    private String login;
+    private final String login;
 }

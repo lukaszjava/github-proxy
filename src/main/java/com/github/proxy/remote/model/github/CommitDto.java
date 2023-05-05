@@ -6,6 +6,6 @@ import lombok.Getter;
 @AllArgsConstructor
 @Getter
 public class CommitDto {
-    private String sha;
-    private String url;
+    private final String sha;
+    private final String url;
 }
