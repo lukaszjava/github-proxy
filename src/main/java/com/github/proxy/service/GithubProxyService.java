@@ -3,7 +3,6 @@ package com.github.proxy.service;
 import com.github.proxy.exception.GithubProxyException;
 import com.github.proxy.exception.GithubUserDoesNotExistException;
 import com.github.proxy.mapper.GithubBranchMapper;
-import com.github.proxy.mapper.GithubRepositoryMapper;
 import com.github.proxy.model.dto.UserRepositoryDetailDto;
 import com.github.proxy.remote.client.GithubApiClient;
 import com.github.proxy.remote.model.github.GithubRepositoryDto;
@@ -24,11 +23,10 @@ import java.util.stream.Collectors;
 public class GithubProxyService {
 
     private final GithubApiClient githubApiClient;
-    private final GithubRepositoryMapper githubRepositoryMapper;
     private final GithubBranchMapper githubBranchMapper;
 
     public List<UserRepositoryDetailDto> getRepositoriesInformation(String username) {
-        ResponseEntity<List<GithubRepositoryDto>> githubRepositoriesResponse = githubApiClient.getRepository(username);
+        ResponseEntity<List<GithubRepositoryDto>> githubRepositoriesResponse = githubApiClient.getRepositories(username);
 
         if (githubRepositoriesResponse.getStatusCode().isSameCodeAs(HttpStatusCode.valueOf(404))) {
             throw new GithubUserDoesNotExistException(String.format("User: %s does not exist.", username));
@@ -39,12 +37,11 @@ public class GithubProxyService {
 
         return githubRepositoriesResponse.getBody().parallelStream()
                 .filter(repository -> !repository.isFork())
-                .map(repository -> {
-                    var repositoryDetails = githubRepositoryMapper.toUserRepositoryDetailDto(repository);
-                    var branches = githubApiClient.getBranches(username, repository.getName());
-                    repositoryDetails.setBranches(githubBranchMapper.toBranchInformation(branches.getBody()));
-                    return repositoryDetails;
-                })
+                .map(repository -> UserRepositoryDetailDto.builder()
+                        .repositoryName(repository.getName())
+                        .ownerLogin(repository.getOwnerDto().getLogin())
+                        .branches(githubBranchMapper.toBranchInformation(githubApiClient.getBranches(username, repository.getName()).getBody()))
+                        .build())
                 .collect(Collectors.toList());
     }
 }

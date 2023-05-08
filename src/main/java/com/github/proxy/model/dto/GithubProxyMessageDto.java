@@ -1,16 +1,17 @@
 package com.github.proxy.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor_ = {@JsonCreator})
 @Getter
 public class GithubProxyMessageDto {
 
-    private int status;
+    private final int status;
     @JsonProperty("Message")
-    private String message;
+    private final String message;
 
     public static GithubProxyMessageDto from(int status, String message) {
         return new GithubProxyMessageDto(status, message);

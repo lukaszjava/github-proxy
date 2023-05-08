@@ -3,7 +3,6 @@ package com.github.proxy.service;
 import com.github.proxy.exception.GithubProxyException;
 import com.github.proxy.exception.GithubUserDoesNotExistException;
 import com.github.proxy.mapper.GithubBranchMapper;
-import com.github.proxy.mapper.GithubRepositoryMapper;
 import com.github.proxy.model.dto.UserRepositoryDetailDto;
 import com.github.proxy.remote.client.GithubApiClient;
 import com.github.proxy.remote.model.github.BranchDto;
@@ -27,23 +26,21 @@ import static org.mockito.Mockito.when;
 
 class GithubProxyServiceTest {
 
-    private GithubApiClient githubApiClient;
-    private GithubRepositoryMapper githubRepositoryMapper;
-    private GithubBranchMapper githubBranchMapper;
-    private GithubProxyService githubProxyService;
+    GithubApiClient githubApiClient;
+    GithubBranchMapper githubBranchMapper;
+    GithubProxyService githubProxyService;
 
     @BeforeEach
     void setUp() {
         this.githubApiClient = Mockito.mock(GithubApiClient.class);
-        this.githubRepositoryMapper = Mappers.getMapper(GithubRepositoryMapper.class);
         this.githubBranchMapper = Mappers.getMapper(GithubBranchMapper.class);
-        this.githubProxyService = new GithubProxyService(githubApiClient, githubRepositoryMapper, githubBranchMapper);
+        this.githubProxyService = new GithubProxyService(githubApiClient, githubBranchMapper);
     }
 
     @Test
     void getRepositoriesInformation_WhenUserDoesNotExist_ThrowsGithubUserDoesNotExistException() {
         String username = "not_found";
-        when(githubApiClient.getRepository(username)).thenReturn(new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
+        when(githubApiClient.getRepositories(username)).thenReturn(new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
 
         assertThrows(GithubUserDoesNotExistException.class, () -> githubProxyService.getRepositoriesInformation(username));
     }
@@ -51,7 +48,7 @@ class GithubProxyServiceTest {
     @Test
     void getRepositoriesInformation_WhenApiReturnsNullBody_ThrowsGithubProxyException() {
         String username = "test-user";
-        when(githubApiClient.getRepository(username)).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
+        when(githubApiClient.getRepositories(username)).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
 
         assertThrows(GithubProxyException.class, () -> githubProxyService.getRepositoriesInformation(username));
     }
@@ -67,7 +64,7 @@ class GithubProxyServiceTest {
                 createBranch("b1", "bnb123"),
                 createBranch("b2", "b213321")
         );
-        when(githubApiClient.getRepository(eq(username))).thenReturn(ResponseEntity.ok(repositoryList));
+        when(githubApiClient.getRepositories(eq(username))).thenReturn(ResponseEntity.ok(repositoryList));
         when(githubApiClient.getBranches(eq(username), anyString())).thenReturn(ResponseEntity.ok(branches));
 
         List<UserRepositoryDetailDto> resultList = githubProxyService.getRepositoriesInformation(username);

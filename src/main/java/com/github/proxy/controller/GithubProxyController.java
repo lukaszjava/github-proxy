@@ -25,14 +25,14 @@ public class GithubProxyController {
     private final GithubProxyService githubProxyService;
 
     @Operation(summary = "Get information about user repositories", tags = "Github Proxy")
-    @ApiResponses(value= {
+    @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "OK",
                     content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = UserRepositoryDetailDto[].class))}),
             @ApiResponse(responseCode = "406", description = "Accept: application/xml header is not supported",
                     content = {@Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = GithubProxyMessageDto.class))})
     })
     @GetMapping(path = "/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
-    private List<UserRepositoryDetailDto> getRepositoriesInformation(@PathVariable("username") String username) {
+    public List<UserRepositoryDetailDto> getRepositoriesInformation(@PathVariable("username") String username) {
         return githubProxyService.getRepositoriesInformation(username);
     }
 
